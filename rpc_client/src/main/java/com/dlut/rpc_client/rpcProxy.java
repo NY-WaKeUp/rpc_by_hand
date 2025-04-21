@@ -51,6 +51,15 @@ public class rpcProxy {
     public <T> T create(final Class<?> interfaceClass) {
         return create(interfaceClass, "");
     }
+    /**
+     * 使用 CGLIB 动态代理机制创建一个指定接口的代理对象，并通过 RPC 调用远程服务。
+     *
+     * @param <T> 返回的代理对象类型，通常为接口类型
+     * @param interfaceClass 需要代理的接口类
+     * @param serviceVersion 服务版本号，用于区分不同版本的服务
+     * @return 返回一个实现了指定接口的代理对象
+     * @throws RuntimeException 如果服务地址为空或 RPC 响应为空，则抛出异常
+     */
     @SuppressWarnings("unchecked")
     public <T> T create(final Class<?> interfaceClass, final String serviceVersion) {
         // 使用 CGLIB 动态代理机制
@@ -59,12 +68,14 @@ public class rpcProxy {
         enhancer.setSuperclass(interfaceClass);
         enhancer.setCallback(new MethodInterceptor() {
             /**
+             * 拦截代理对象的方法调用，将其转换为 RPC 请求并发送到远程服务。
+             *
              * @param o 被代理的对象（需要增强的对象）
              * @param method 被拦截的方法（需要增强的方法）
              * @param args 方法入参
              * @param methodProxy 用于调用原始方法
-             * @return
-             * @throws Throwable
+             * @return 返回远程服务的调用结果
+             * @throws Throwable 如果远程调用过程中发生异常，则抛出
              */
             @Override
             public Object intercept(Object o, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
